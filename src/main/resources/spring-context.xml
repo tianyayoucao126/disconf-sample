@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/aop 
+        http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <context:component-scan base-package="com.cnblogs.yjmyzz.disconf.sample"/>
+
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+    <!-- disconf 配置开始 -->
+    <bean id="disconfMgrBean" class="com.baidu.disconf.client.DisconfMgrBean"
+          destroy-method="destroy">
+        <property name="scanPackage" value="com.cnblogs.yjmyzz.disconf.sample"/>
+    </bean>
+    <bean id="disconfMgrBean2" class="com.baidu.disconf.client.DisconfMgrBeanSecond"
+          init-method="init" destroy-method="destroy">
+    </bean>
+
+    <bean id="configproperties_disconf"
+          class="com.baidu.disconf.client.addons.properties.ReloadablePropertiesFactoryBean">
+        <property name="locations">
+            <list>
+                <!--jdbc.properties为disconf-web上配置文件的key-->
+                <value>jdbc.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="propertyConfigurer"
+          class="com.baidu.disconf.client.addons.properties.ReloadingPropertyPlaceholderConfigurer">
+        <property name="ignoreResourceNotFound" value="true"/>
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="propertiesArray">
+            <list>
+                <ref bean="configproperties_disconf"/>
+            </list>
+        </property>
+    </bean>
+    <!-- disconf 配置结束 -->
+
+
+    <bean class="com.cnblogs.yjmyzz.disconf.sample.conf.JdbcConfig" id="jdbcConfig">
+        <property name="jdbcDriver" value="${jdbc-driver}"/>
+        <property name="jdbcUrl" value="${jdbc-url}"/>
+        <property name="jdbcUser" value="${jdbc-user}"/>
+        <property name="jdbcPassword" value="${jdbc-password}"/>
+    </bean>
+
+    <bean class="com.cnblogs.yjmyzz.disconf.sample.conf.MyConfig" id="myConfig"/>
+
+</beans>
